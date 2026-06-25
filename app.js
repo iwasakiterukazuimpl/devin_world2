@@ -8,6 +8,15 @@ let nextId = 1;
 
 // Todo一覧を取得
 app.get('/todos', (req, res) => {
+  const { completed } = req.query;
+
+  if (completed === 'true') {
+    return res.json(todos.filter((t) => t.completed === true));
+  }
+  if (completed === 'false') {
+    return res.json(todos.filter((t) => t.completed === false));
+  }
+
   res.json(todos);
 });
 
