@@ -20,6 +20,40 @@ describe('GET /todos', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(2);
   });
+
+  test('completed=trueで完了済みのみ返す', async () => {
+    await request(app).post('/todos').send({ title: 'タスクA' });
+    await request(app).post('/todos').send({ title: 'タスクB' });
+    await request(app).patch('/todos/1').send({ completed: true });
+
+    const res = await request(app).get('/todos?completed=true');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].completed).toBe(true);
+    expect(res.body[0].title).toBe('タスクA');
+  });
+
+  test('completed=falseで未完了のみ返す', async () => {
+    await request(app).post('/todos').send({ title: 'タスクA' });
+    await request(app).post('/todos').send({ title: 'タスクB' });
+    await request(app).patch('/todos/1').send({ completed: true });
+
+    const res = await request(app).get('/todos?completed=false');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].completed).toBe(false);
+    expect(res.body[0].title).toBe('タスクB');
+  });
+
+  test('completedパラメータなしで全件返す', async () => {
+    await request(app).post('/todos').send({ title: 'タスクA' });
+    await request(app).post('/todos').send({ title: 'タスクB' });
+    await request(app).patch('/todos/1').send({ completed: true });
+
+    const res = await request(app).get('/todos');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(2);
+  });
 });
 
 describe('POST /todos', () => {
